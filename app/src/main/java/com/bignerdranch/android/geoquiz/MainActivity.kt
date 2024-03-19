@@ -90,8 +90,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkAnswer(userAnswer: Boolean) {
         val correctAnswer = questionBank[currentIndex].answer
-        Log.d("The answer is:", correctAnswer.toString())
-        Log.d("The answer is:", userAnswer.toString())
         val messageResId = if (userAnswer == correctAnswer) {
             R.string.correct_toast
         }

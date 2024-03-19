@@ -1,13 +1,11 @@
 package com.bignerdranch.android.geoquiz
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.bignerdranch.android.geoquiz.databinding.ActivityMainBinding
-import com.google.android.material.snackbar.Snackbar
 
 private const val TAG = "MainActivity"
 class MainActivity : AppCompatActivity() {
@@ -24,6 +22,8 @@ class MainActivity : AppCompatActivity() {
 
     private var currentIndex = 0
 
+    var questionAnswered = BooleanArray(questionBank.size)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate(Bundle?) called")
@@ -31,22 +31,28 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.trueButton.setOnClickListener { view: View ->
-           checkAnswer(true)
+            questionAnswered[currentIndex] = true
+            isAnswered()
+            checkAnswer(true)
         }
         binding.falseButton.setOnClickListener { view: View ->
+            questionAnswered[currentIndex] = true
+            isAnswered()
             checkAnswer(false)
         }
         binding.nextButton.setOnClickListener {
             currentIndex = (currentIndex + 1) % questionBank.size
             updateQuestion()
+            isAnswered()
         }
         binding.prevButton.setOnClickListener{
             if (currentIndex == 0) {
-                currentIndex = questionBank.size - 1;
+                currentIndex = questionBank.size - 1
             } else {
-                currentIndex--;
+                currentIndex--
             }
             updateQuestion()
+            isAnswered()
         }
         updateQuestion()
     }
@@ -79,11 +85,13 @@ class MainActivity : AppCompatActivity() {
     private fun updateQuestion() {
         val questionTextResId = questionBank[currentIndex].textResId
         binding.questionTextView.setText(questionTextResId)
+        isAnswered()
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
         val correctAnswer = questionBank[currentIndex].answer
-
+        Log.d("The answer is:", correctAnswer.toString())
+        Log.d("The answer is:", userAnswer.toString())
         val messageResId = if (userAnswer == correctAnswer) {
             R.string.correct_toast
         }
@@ -92,4 +100,15 @@ class MainActivity : AppCompatActivity() {
         }
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
     }
+
+    private fun isAnswered() {
+        if (!questionAnswered[currentIndex]) {
+            binding.trueButton.isEnabled = true
+            binding.falseButton.isEnabled = true
+        } else {
+            binding.trueButton.isEnabled = false
+            binding.falseButton.isEnabled = false
+        }
+    }
+
 }
